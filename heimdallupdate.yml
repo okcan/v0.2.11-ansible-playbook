@@ -1,0 +1,38 @@
+---
+- name: Update Heimdall
+  hosts: all
+  serial: 1
+  tasks:
+    - name: git pull
+      ansible.builtin.command:
+        cmd: git pull
+      args:
+        chdir: heimdall
+      ignore_errors: yes
+
+    - name: Git checkout
+      ansible.builtin.command:
+        cmd: git checkout v0.2.11
+      args:
+        chdir: heimdall
+
+    - name: install make mainnet
+      command: chdir={{ ansible_env.HOME }}/heimdall make install network=mumbai
+              
+    - name: heimdall version
+      ansible.builtin.shell:
+        cmd: heimdalld version
+
+    - name: restart heimdall
+      ansible.builtin.shell:
+        cmd: sudo service heimdalld restart
+    
+    - name: restart rest server
+      ansible.builtin.shell:
+        cmd: sudo service heimdalld-rest-server restart
+    
+    - name: restart telemetry
+      ansible.builtin.shell:
+        cmd: sudo service telemetry restart
+
+
